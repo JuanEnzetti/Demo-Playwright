@@ -1,0 +1,80 @@
+[     360ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[     442ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.saucedemo.com/:0
+[   10011ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   10054ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   10092ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.saucedemo.com/:0
+[   12317ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.saucedemo.com/inventory.html:0
+[   12349ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   12456ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   12491ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   12524ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.saucedemo.com/:0
+[   13110ms] Error: Failed to add item to the cart.
+    at f (https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:45831)
+    at a (https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:46170)
+    at yd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:126079)
+    at https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:131072
+    at ln (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:15065)
+    at wd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:127306)
+    at dp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28441)
+    at lp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28263)
+[   13334ms] Error: Failed to add item to the cart.
+    at f (https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:45831)
+    at a (https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:46170)
+    at yd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:126079)
+    at https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:131072
+    at ln (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:15065)
+    at wd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:127306)
+    at dp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28441)
+    at lp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28263)
+[   13788ms] Error: Failed to add item to the cart.
+    at f (https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:45831)
+    at a (https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:46170)
+    at yd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:126079)
+    at https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:131072
+    at ln (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:15065)
+    at wd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:127306)
+    at dp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28441)
+    at lp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28263)
+[   14014ms] Error: Failed to remove item from cart.
+    at p (https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:45952)
+    at https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:46161
+    at yd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:126079)
+    at https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:131072
+    at ln (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:15065)
+    at wd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:127306)
+    at dp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28441)
+    at lp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28263)
+[   14256ms] Error: Failed to remove item from cart.
+    at p (https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:45952)
+    at https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:46161
+    at yd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:126079)
+    at https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:131072
+    at ln (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:15065)
+    at wd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:127306)
+    at dp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28441)
+    at lp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28263)
+[   14481ms] Error: Failed to remove item from cart.
+    at p (https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:45952)
+    at https://www.saucedemo.com/assets/index-DnLqFcJI.js:573:46161
+    at yd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:126079)
+    at https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:131072
+    at ln (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:15065)
+    at wd (https://www.saucedemo.com/assets/index-DnLqFcJI.js:15:127306)
+    at dp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28441)
+    at lp (https://www.saucedemo.com/assets/index-DnLqFcJI.js:16:28263)
+[   14724ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.saucedemo.com/inventory.html:0
+[   14746ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   23411ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   23447ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   23480ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.saucedemo.com/:0
+[   28522ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://events.backtrace.io/api/unique-events/submit?universe=UNIVERSE&token=TOKEN:0
+[   28523ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://events.backtrace.io/api/summed-events/submit?universe=UNIVERSE&token=TOKEN:0
+[   30559ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   30586ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   30626ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.saucedemo.com/:0
+[   37117ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://events.backtrace.io/api/summed-events/submit?universe=UNIVERSE&token=TOKEN:0
+[   37674ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://events.backtrace.io/api/unique-events/submit?universe=UNIVERSE&token=TOKEN:0
+[   61141ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://events.backtrace.io/api/summed-events/submit?universe=UNIVERSE&token=TOKEN:0
+[   62435ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://events.backtrace.io/api/unique-events/submit?universe=UNIVERSE&token=TOKEN:0
+[   94761ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://events.backtrace.io/api/summed-events/submit?universe=UNIVERSE&token=TOKEN:0
+[   96448ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://events.backtrace.io/api/unique-events/submit?universe=UNIVERSE&token=TOKEN:0

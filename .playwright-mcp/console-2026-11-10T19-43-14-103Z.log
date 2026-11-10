@@ -1,0 +1,19 @@
+[     380ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[     459ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.saucedemo.com/:0
+[    1530ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.saucedemo.com/inventory.html:0
+[    1560ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[    9619ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[    9651ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.saucedemo.com/:0
+[    9948ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.saucedemo.com/inventory.html:0
+[    9972ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   30434ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.saucedemo.com/inventory.html:0
+[   30464ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   44285ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.saucedemo.com/inventory.html:0
+[   44310ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   54406ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.saucedemo.com/:0
+[   65732ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.saucedemo.com/inventory.html:0
+[   65755ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   81557ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.saucedemo.com/cart.html:0
+[   81857ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3
+[   82310ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.saucedemo.com/inventory-item.html?id=99:0
+[   82344ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://www.saucedemo.com/assets/index-DnLqFcJI.js:3

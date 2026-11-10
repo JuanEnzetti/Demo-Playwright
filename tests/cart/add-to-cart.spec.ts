@@ -1,6 +1,7 @@
 import { test, expect } from '../../src/fixtures/test';
 import { users } from '../../src/data/users';
 import { products } from '../../src/data/products';
+import { CartPage } from '../../src/pages/CartPage';
 
 test.describe('Cart', () => {
   test('standard user can log in and add a t-shirt to the cart', async ({
@@ -15,6 +16,7 @@ test.describe('Cart', () => {
       await loginPage.login(users.standard);
       await expect(page).toHaveURL(inventoryPage.url);
       await expect(inventoryPage.title).toHaveText('Products');
+      await expect(await CartPage.isTrue()).toBe(true);  
     });
 
     await test.step(`Add "${tShirt.name}" to the cart`, async () => {

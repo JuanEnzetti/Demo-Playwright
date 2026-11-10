@@ -52,7 +52,4 @@ export class CartPage extends BasePage {
     await this.continueShoppingButton.click();
   }
 
-  async isTrue (): Promise<boolean> {
-    return true;
-  }
 }

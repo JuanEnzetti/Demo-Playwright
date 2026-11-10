@@ -1,59 +1,296 @@
-name: Playwright Tests
+name: QA AI Pipeline (Análisis estático + E2E + Informe)
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
-  workflow_dispatch:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
 
 jobs:
-  test:
-    name: E2E (chromium)
+  review_ia:
+    name: Análisis estático de código (IA)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
         with:
-          node-version: lts/*
-          cache: npm
+          fetch-depth: 0
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Build PR diff
+        run: |
+          set -euo pipefail
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          git fetch --no-tags --prune origin "$BASE_SHA" "$HEAD_SHA" || true
+          git diff --unified=3 "$BASE_SHA" "$HEAD_SHA" > pr.diff
 
-      - name: Type check
-        run: npm run typecheck
+      - name: Claude reviews diff
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Estás revisando cambios en tests de Playwright dentro de un Pull Request de GitHub.
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+            REGLA DE SEGURIDAD Y COSTE:
+            - Solo tienes acceso al diff del PR en ./pr.diff
+            - NO solicites el repositorio completo.
+            - Basa tu feedback ÚNICAMENTE en lo que puedas ver en el diff.
 
-      - name: Run Playwright tests
-        run: npx playwright test
+            TAREA:
+            1) Lee ./pr.diff
+            2) Analiza los cambios e identifica problemas de buenas prácticas de Playwright:
+               - Selectores frágiles (preferir getByRole/getByLabel/getByTestId)
+               - Esperas estáticas (waitForTimeout / sleep)
+               - Assertions ausentes o débiles
+               - Patrones de flakiness (timing, race conditions, waits inestables)
+               - Repetición que debería moverse a fixtures/helpers
+               - Problemas de CI si son visibles
 
-      - name: Upload HTML report
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+            SALIDA:
+            Escribe un archivo en ./ai-review.md con un comentario en Markdown pensado para
+            publicarse directamente como comentario general en la PR.
+
+            Formato:
+            ## 🔍 Análisis estático de código (IA)
+
+            **Resumen:** (2-3 frases sobre el estado general de los cambios)
+
+            ### Hallazgos
+            - **[archivo:línea]** — descripción del problema y sugerencia concreta
+            - ...
+
+            ### Veredicto
+            (Una frase: si los cambios son aceptables, necesitan ajustes menores o tienen problemas importantes)
+
+            REGLAS:
+            - Máximo 10 hallazgos.
+            - Si no hay problemas, di que los cambios se ven bien.
+            - Sé conciso, directo y constructivo.
+            - Todo en ESPAÑOL.
+          claude_args: --allowedTools Read,Write
+
+      - name: Post PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const body = fs.readFileSync("ai-review.md", "utf8").trim();
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: body || "✅ AI Review completado sin hallazgos relevantes."
+            });
+
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - name: Run tests
+        id: run_tests
+        continue-on-error: true
+        run: npm run test
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 14
-
-      - name: Upload test results (traces, videos, screenshots)
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: test-results
-          path: test-results/
-          retention-days: 7
+          path: test-results.json
+      - name: Fail job if tests failed
+        if: steps.run_tests.outcome == 'failure'
+        run: exit 1
+
+  informe_ia:
+    name: Informe de Calidad - CI Workflow
+    needs: e2e
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.e2e.result == 'failure' }}
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download test-results artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          path: artifacts/test-results
+
+      - name: Prepare workspace
+        run: |
+          mkdir -p informe-input informe-output
+          cp artifacts/test-results/test-results.json informe-input/test-results.json || cp artifacts/test-results.json informe-input/test-results.json
+
+      # --- PASO 1: AGRUPACIÓN ---
+      - name: 1. Claude - Group Failures
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Lee las instrucciones de ./prompts/ai-group-failures.txt
+            Aplica esas instrucciones leyendo el archivo ./informe-input/test-results.json
+            Escribe el resultado EXACTAMENTE en ./informe-output/ai-failures-grouped.json
+            No añadas ningún texto extra, solo crea el fichero con el JSON limpio.
+          claude_args: --allowedTools Read,Write
+
+      - name: Clean Grouped JSON Output
+        run: |
+          node -e '
+            const fs = require("fs");
+            let raw = fs.readFileSync("informe-output/ai-failures-grouped.json", "utf8");
+            raw = raw.replace(/^```json\s*/m, "").replace(/\s*```$/m, "").trim();
+            fs.writeFileSync("informe-output/ai-failures-grouped.json", raw);
+          '
+
+      # --- PASO 1.5: PREPARAR INPUT PARA EL RESUMEN ---
+      - name: Prepare Summary Input
+        run: |
+          node -e '
+            const fs = require("fs");
+            const pwData = JSON.parse(fs.readFileSync("informe-input/test-results.json", "utf8"));
+            const stats = pwData.stats || { total: 0, passed: 0, failed: 0, skipped: 0, flaky: 0, duration_ms: 0 };
+            const grouped = JSON.parse(fs.readFileSync("informe-output/ai-failures-grouped.json", "utf8"));
+            fs.writeFileSync("informe-input/summary-input.json", JSON.stringify({ stats, grouped }));
+          '
+
+      # --- PASO 2: RESUMEN DE NEGOCIO ---
+      - name: 2. Claude - Business Summary
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Lee las instrucciones de ./prompts/ai-summary.txt
+            Aplica esas instrucciones leyendo el archivo ./informe-input/summary-input.json
+            Escribe el resultado en texto plano EXACTAMENTE en ./informe-output/business-summary.txt
+          claude_args: --allowedTools Read,Write
+
+      # --- PASO 3: TICKETS ---
+      - name: 3. Claude - Jira Tickets
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Lee las instrucciones de ./prompts/ai-tickets.txt
+            Aplica esas instrucciones leyendo el archivo ./informe-output/ai-failures-grouped.json
+            Escribe el resultado EXACTAMENTE en ./informe-output/ai-tickets.json
+            Asegúrate de que la salida sea un Array JSON limpio.
+          claude_args: --allowedTools Read,Write
+
+      # --- PASO 4: CORRECCIONES ---
+      - name: 4. Claude - Code Corrections
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Lee las instrucciones de ./prompts/ai-corrections.txt
+            Aplica esas instrucciones leyendo el archivo ./informe-output/ai-failures-grouped.json
+            Escribe el resultado EXACTAMENTE en ./informe-output/ai-corrections.json
+            Asegúrate de que la salida sea un Array JSON limpio.
+          claude_args: --allowedTools Read,Write
+
+      - name: Subir Informes IA Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-informe-outputs
+          path: informe-output/
+
+      # --- PASO 5: ETIQUETAS Y COMENTARIO FINAL ---
+      - name: Apply Label & Post PR Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.payload.pull_request.number;
+
+            // 1. ETIQUETA DE RIESGO
+            const groupedRaw = fs.readFileSync("informe-output/ai-failures-grouped.json", "utf8").replace(/^```json\s*/m, "").replace(/\s*```$/m, "").trim();
+            const grouped = JSON.parse(groupedRaw);
+            const risk = (grouped.risk_level || "medium").toLowerCase();
+
+            const labelMap = {
+              high:   { name: "ai:critical-risk", color: "b60205" },
+              medium: { name: "ai:needs-review",  color: "fbca04" },
+              low:    { name: "ai:low-risk",       color: "0e8a16" }
+            };
+            const labelConfig = labelMap[risk] || labelMap.medium;
+
+            try { await github.rest.issues.getLabel({ owner, repo, name: labelConfig.name }); }
+            catch { await github.rest.issues.createLabel({ owner, repo, name: labelConfig.name, color: labelConfig.color }); }
+
+            const aiLabels = ["ai:critical-risk", "ai:needs-review", "ai:low-risk"];
+            const currentLabels = await github.rest.issues.listLabelsOnIssue({ owner, repo, issue_number: prNumber });
+            for (const label of currentLabels.data) {
+              if (aiLabels.includes(label.name) && label.name !== labelConfig.name) {
+                await github.rest.issues.removeLabel({ owner, repo, issue_number: prNumber, name: label.name });
+              }
+            }
+            await github.rest.issues.addLabels({ owner, repo, issue_number: prNumber, labels: [labelConfig.name] });
+
+            // 2. COMENTARIO EN PR
+            const business = fs.readFileSync("informe-output/business-summary.txt", "utf8");
+
+            let ticketsHtml = "";
+            try {
+              const tickets = JSON.parse(fs.readFileSync("informe-output/ai-tickets.json", "utf8").replace(/^```json\s*/m, "").replace(/\s*```$/m, "").trim());
+              ticketsHtml = tickets.map(t => `- **[${(t.severidad || "MEDIA").toUpperCase()}]** ${t.titulo}`).join("\n");
+            } catch (e) { ticketsHtml = "_No se pudieron generar los tickets correctamente._"; }
+
+            let fixesHtml = "";
+            try {
+              const fixes = JSON.parse(fs.readFileSync("informe-output/ai-corrections.json", "utf8").replace(/^```json\s*/m, "").replace(/\s*```$/m, "").trim());
+              fixesHtml = fixes.map(f =>
+                `**${f.group_id}: ${f.error_message}**\n` +
+                `_Hipótesis:_ ${f.hipotesis_causa}\n` +
+                (f.pasos_para_corregir || []).map(s => `- ${s}`).join("\n")
+              ).join("\n\n");
+            } catch (e) { fixesHtml = "_No se pudieron generar las correcciones._"; }
+
+            const body = `
+            ## 🚨 Informe de Calidad (IA)
+
+            ${business}
+
+            ---
+
+            <details>
+            <summary>💡 <b>Ver sugerencias de código (Correcciones)</b></summary>
+            <br>\n\n${fixesHtml}\n
+            </details>
+
+            <details>
+            <summary>🎫 <b>Ver tickets generados (Jira Drafts)</b></summary>
+            <br>\n\n${ticketsHtml}\n\n
+            *(Los archivos JSON completos están adjuntos en los artefactos de GitHub Actions para su importación)*
+            </details>
+            `;
+
+            await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });

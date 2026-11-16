@@ -17,8 +17,15 @@ jobs:
       issues: write
       id-token: write
       actions: read
+    env:
+      HAS_CLAUDE_AUTH: ${{ secrets.ANTHROPIC_API_KEY != '' || secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
 
     steps:
+      - name: Check Claude credentials
+        if: env.HAS_CLAUDE_AUTH != 'true'
+        run: |
+          echo "::warning title=Faltan credenciales de Claude::No se encontró ANTHROPIC_API_KEY ni CLAUDE_CODE_OAUTH_TOKEN en los secrets del repositorio (Settings > Secrets and variables > Actions). Se omiten los pasos de IA. Nota: los PRs desde forks o de Dependabot no reciben secrets."
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -32,8 +39,10 @@ jobs:
           git diff --unified=3 "$BASE_SHA" "$HEAD_SHA" > pr.diff
 
       - name: Claude reviews diff
+        if: env.HAS_CLAUDE_AUTH == 'true'
         uses: anthropics/claude-code-action@v1
         with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             Estás revisando cambios en tests de Playwright dentro de un Pull Request de GitHub.
@@ -77,6 +86,7 @@ jobs:
           claude_args: --allowedTools Read,Write
 
       - name: Post PR comment
+        if: env.HAS_CLAUDE_AUTH == 'true'
         uses: actions/github-script@v7
         with:
           script: |
@@ -133,8 +143,15 @@ jobs:
       issues: write
       id-token: write
       actions: read
+    env:
+      HAS_CLAUDE_AUTH: ${{ secrets.ANTHROPIC_API_KEY != '' || secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
 
     steps:
+      - name: Check Claude credentials
+        if: env.HAS_CLAUDE_AUTH != 'true'
+        run: |
+          echo "::warning title=Faltan credenciales de Claude::No se encontró ANTHROPIC_API_KEY ni CLAUDE_CODE_OAUTH_TOKEN en los secrets del repositorio (Settings > Secrets and variables > Actions). Se omiten los pasos de IA. Nota: los PRs desde forks o de Dependabot no reciben secrets."
+
       - uses: actions/checkout@v4
 
       - name: Download test-results artifact
@@ -150,8 +167,10 @@ jobs:
 
       # --- PASO 1: AGRUPACIÓN ---
       - name: 1. Claude - Group Failures
+        if: env.HAS_CLAUDE_AUTH == 'true'
         uses: anthropics/claude-code-action@v1
         with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             Lee las instrucciones de ./prompts/ai-group-failures.txt
@@ -161,6 +180,7 @@ jobs:
           claude_args: --allowedTools Read,Write
 
       - name: Clean Grouped JSON Output
+        if: env.HAS_CLAUDE_AUTH == 'true'
         run: |
           node -e '
             const fs = require("fs");
@@ -171,6 +191,7 @@ jobs:
 
       # --- PASO 1.5: PREPARAR INPUT PARA EL RESUMEN ---
       - name: Prepare Summary Input
+        if: env.HAS_CLAUDE_AUTH == 'true'
         run: |
           node -e '
             const fs = require("fs");
@@ -182,8 +203,10 @@ jobs:
 
       # --- PASO 2: RESUMEN DE NEGOCIO ---
       - name: 2. Claude - Business Summary
+        if: env.HAS_CLAUDE_AUTH == 'true'
         uses: anthropics/claude-code-action@v1
         with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             Lee las instrucciones de ./prompts/ai-summary.txt
@@ -193,8 +216,10 @@ jobs:
 
       # --- PASO 3: TICKETS ---
       - name: 3. Claude - Jira Tickets
+        if: env.HAS_CLAUDE_AUTH == 'true'
         uses: anthropics/claude-code-action@v1
         with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             Lee las instrucciones de ./prompts/ai-tickets.txt
@@ -205,8 +230,10 @@ jobs:
 
       # --- PASO 4: CORRECCIONES ---
       - name: 4. Claude - Code Corrections
+        if: env.HAS_CLAUDE_AUTH == 'true'
         uses: anthropics/claude-code-action@v1
         with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             Lee las instrucciones de ./prompts/ai-corrections.txt
@@ -216,6 +243,7 @@ jobs:
           claude_args: --allowedTools Read,Write
 
       - name: Subir Informes IA Artifacts
+        if: env.HAS_CLAUDE_AUTH == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ai-informe-outputs
@@ -223,6 +251,7 @@ jobs:
 
       # --- PASO 5: ETIQUETAS Y COMENTARIO FINAL ---
       - name: Apply Label & Post PR Comment
+        if: env.HAS_CLAUDE_AUTH == 'true'
         uses: actions/github-script@v7
         with:
           script: |

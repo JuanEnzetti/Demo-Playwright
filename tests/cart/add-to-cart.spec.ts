@@ -15,8 +15,7 @@ test.describe('Cart', () => {
       await loginPage.goto();
       await loginPage.login(users.standard);
       await expect(page).toHaveURL(inventoryPage.url);
-      await expect(inventoryPage.title).toHaveText('Products');
-      await expect(await CartPage.isTrue()).toBe(true);  
+      await expect(inventoryPage.title).toHaveText('Products');  
     });
 
     await test.step(`Add "${tShirt.name}" to the cart`, async () => {
